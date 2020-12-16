@@ -1,5 +1,5 @@
 ﻿using System;
-using HelloWorldDemo.Model;
+// using HelloWorldDemo.Model;
 
 namespace HelloWorldDemo
 {
@@ -11,8 +11,8 @@ namespace HelloWorldDemo
 
             Console.WriteLine("This is the official Batch Rock-Paper-Scissors");
 
-            Options enumUserChoice = new Options();
-            Options enumComputerChoice = new Options();
+            Options UserChoice = new Options();
+            Options ComputerChoice = new Options();
             do
             {
                 #region GameMessage
@@ -22,59 +22,75 @@ namespace HelloWorldDemo
                 
                 string strUserResponse = Console.ReadLine();
                 strUserResponse = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(strUserResponse.ToLower());
-
-                #endregion
-
+                
                 // Console.WriteLine(Enum.TryParse(strUserResponse, out enumUserChoice ).ToString());
                 // Console.WriteLine(IsValidGameOption(strUserResponse).ToString());
+                #endregion
 
-                if ( !Enum.TryParse(strUserResponse, out enumUserChoice ) || !IsValidGameOption(strUserResponse) )
+
+                if ( !Enum.TryParse(strUserResponse, out UserChoice ) || !IsValidGameOption(strUserResponse) )
                 {
                     Console.WriteLine("Invalid Input, try again.");
                     continue;
                 }
 
-                Console.WriteLine($"The user response is: {enumUserChoice}");
+                Console.WriteLine($"The user response is: {UserChoice}");
                 
                 
                 Random random = new Random(10);
-                enumComputerChoice = (Options) random.Next(1,4);
+                ComputerChoice = (Options) random.Next(1,4);
 
-                Console.WriteLine($"Choice of the computer: {enumComputerChoice}");
+                Console.WriteLine($"Choice of the computer: {ComputerChoice}");
 
-                //Enum Values(More legible)
-                if ( (enumUserChoice == Options.Rock && enumComputerChoice == Options.Scissors ) ||
-                     (enumUserChoice == Options.Paper && enumComputerChoice == Options.Rock ) ||
-                     (enumUserChoice == Options.Scissors && enumComputerChoice == Options.Paper ) )
-                {
-                    //User won
+
+                //expropriation time 
+                int intOperation = (int) UserChoice - (int) ComputerChoice;
+                if ( intOperation == 1 || intOperation == -2 )
                     Console.WriteLine("Congratulations, you won!");
-                }
-                else if ( enumUserChoice == enumComputerChoice)
-                {
-                    //Tie
+                else if ( intOperation == 0 )
                     Console.WriteLine("It is a tie!");
-                }
                 else
-                {
-                    //Computer Won
                     Console.WriteLine("You have lost, better luck next time!");
+
+                // //My previous version validating...
+                // if ( (UserChoice == Options.Rock && ComputerChoice == Options.Scissors ) ||
+                //      (UserChoice == Options.Paper && ComputerChoice == Options.Rock ) ||
+                //      (UserChoice == Options.Scissors && ComputerChoice == Options.Paper ) )
+                // {
+                //     //User won
+                //     Console.WriteLine("Congratulations, you won!");
+                // }
+                // else if ( UserChoice == ComputerChoice)
+                // {
+                //     //Tie
+                //     Console.WriteLine("It is a tie!");
+                // }
+                // else
+                // {
+                //     //Computer Won
+                //     Console.WriteLine("You have lost, better luck next time!");
+                // }
+
+                Console.WriteLine("Play again??: Y/N");
+
+                string strPlayAgain = Console.ReadLine();
+                if ( strPlayAgain.ToLower().Trim() != "y" )
+                {
+                    break;
                 }
-                break;
-
-
-
             }while(true);
+
         }
 
         public static bool IsValidGameOption(string OptionUser)
         {
-
             int intNumber;
             
             if ( int.TryParse(OptionUser.ToString(),out intNumber) )
             {
-                Console.WriteLine($"It is a number: {intNumber}");
+                // Console.WriteLine($"It is a number: {intNumber}");
+
+                //Validating if its only a 
                 if(Enum.IsDefined(typeof(Options),  intNumber))
                     return true;
                 else
@@ -82,6 +98,7 @@ namespace HelloWorldDemo
             }
             else
             {
+                // 
                 if(Enum.IsDefined(typeof(Options),  OptionUser))
                     return true;
                 else
@@ -89,5 +106,12 @@ namespace HelloWorldDemo
             }
         }
         
+    }
+
+    public enum Options
+    {
+        Rock=1,
+        Paper=2,
+        Scissors=3
     }
 }

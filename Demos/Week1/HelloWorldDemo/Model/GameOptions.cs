@@ -1,15 +1,6 @@
 namespace HelloWorldDemo.Model
 {
-    public class RPS_Game
-    {
-        
-        
-    
-
-    }
-
-
-    public enum Options
+    public enum GameOptions
     {
         Rock=1,
         Paper=2,

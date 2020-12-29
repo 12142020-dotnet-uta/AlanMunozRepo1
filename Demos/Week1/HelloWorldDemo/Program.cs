@@ -8,6 +8,7 @@ namespace HelloWorldDemo
         {
             Console.WriteLine("Hello World!");
             Console.WriteLine("Please enter a word.");
+
             string response = Console.ReadLine();
             Console.WriteLine($"Your response is {response}.");
 
@@ -15,7 +16,11 @@ namespace HelloWorldDemo
             Console.WriteLine("there ");
             Console.WriteLine("tiger. ");
             Console.WriteLine("Ahh! ");
-
+            string myRespose = Console.ReadLine();
+            
+            Console.WriteLine($"The input was: {myRespose}" );
+            
+            
 
         }
     }

@@ -18,7 +18,7 @@ namespace P0_RepositoryLayer.Models
         // -> Not sure if it needs the OrderDetail list, or with the order object it can retrieve it...
 
         private Order CurrentOrder = new Order();
-        private Customer LoggedCustomer;
+        private Customer LoggedCustomer = new Customer();
         
         // ->
         private List<Inventory> LocalInventory = new List<Inventory>();
@@ -95,11 +95,11 @@ namespace P0_RepositoryLayer.Models
                 myDbContext.SaveChanges();
 
                 this.Customers = myDbContext.Customers.ToList();
-
+                this.LoggedCustomer = this.myDbContext.Customers.First(x => x.FirstName == strFirstName && x.LastName == strLastName);
                 return $"The customer {customer.ToString()} was created successfully.\n";
             }
-            this.LoggedCustomer = this.Customers.Find(x => x.FirstName == strFirstName && x.LastName == strLastName);
 
+            this.LoggedCustomer = this.myDbContext.Customers.First(x => x.FirstName == strFirstName && x.LastName == strLastName);
             return $"Welcome {this.LoggedCustomer.ToString()}"; 
 
         }
@@ -296,7 +296,7 @@ namespace P0_RepositoryLayer.Models
         {
             int result = 0;
 
-            if( !int.TryParse( strProductID, out result ) || !Products.Exists( x => x.ProductID == result ) )
+            if( !int.TryParse( strProductID, out result ) || !this.LocalInventory.Exists( x => x.Product.ProductID == result ) )
             {
                 return false;
             }
@@ -422,7 +422,7 @@ namespace P0_RepositoryLayer.Models
 
                 foreach (OrderDetail orderDetail in OrderDetails)
                 {
-                    strCustomerHistory += $"\t\tProduct: {orderDetail.Product.Name}, Quantity: {orderDetail.Quantity}\n";
+                    strCustomerHistory += $"\t\tProduct: {orderDetail.Product.Name}, Description: {orderDetail.Product.Description}, Quantity: {orderDetail.Quantity}\n";
                 }
             }
 
@@ -454,7 +454,7 @@ namespace P0_RepositoryLayer.Models
 
                 foreach (OrderDetail orderDetail in OrderDetails)
                 {
-                    strLocationHistory += $"\t\tProduct: {orderDetail.Product.Name}, Quantity: {orderDetail.Quantity}\n";
+                    strLocationHistory += $"\t\tProduct: {orderDetail.Product.Name}, Description: {orderDetail.Product.Description}, Quantity: {orderDetail.Quantity}\n";
                 }
                 strLocationHistory += "\n";
             }
@@ -516,9 +516,14 @@ namespace P0_RepositoryLayer.Models
 
             if ( this.myDbContext.Products.ToList().Exists(x => x.Name == strName && x.Description == strDescription) )
             {
+
                 //It exist, only add to this store inventory with 
                 Product VerifyExistingProduct = this.myDbContext.Products.FirstOrDefault(x => x.Name == strName && x.Description == strDescription);
 
+                if ( this.LocalInventory.Exists( x => x.Product.ProductID == VerifyExistingProduct.ProductID ) )
+                {
+                    throw new Exception( "This product already exists in this store." );
+                }
                 Inventory myInventory = new Inventory();
 
                 myInventory.Quantity = intQuantity;

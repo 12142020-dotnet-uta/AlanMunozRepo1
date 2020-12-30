@@ -3,15 +3,16 @@ using Xunit;
 using Microsoft.EntityFrameworkCore;
 using P0_RepositoryLayer.Models;
 using System.Linq;
+using P0_CLibrary.Models;
 
 namespace P0_RepositoryLayer.Tests
 {
     public class UnitTest1
     {
         [Theory]
-        [InlineData("Gabriel", "Schroeder")]// Add new user
-        [InlineData("Alan", "Munoz")] // Already one created
-        [InlineData("Gabriel1", "")] // something to get a error....
+        [InlineData("Gabriel", "Schroeder")]
+        [InlineData("None", "_")]
+        [InlineData("Lorem", "Ipsum")]
         public void AddCustomerToDatabase(string strFirstName, string strLastName)
         {
             //Arrange
@@ -19,14 +20,48 @@ namespace P0_RepositoryLayer.Tests
             .UseInMemoryDatabase(databaseName: "TestDb")
             .Options;
 
-            string CustomerLogInRequest = "";
+            Customer myGeneratedCustomer = new Customer();
 
             //Act
             using (StoreDbContext dbContext = new StoreDbContext( options ))
             {
                 P0_RLayer myRepoLayer = new P0_RLayer( dbContext );
 
+                myRepoLayer.CreateCustomer();
+                myGeneratedCustomer = myRepoLayer.Customers.FirstOrDefault( x => x.ToString() == $"{strFirstName} {strLastName}" );
+            }
+
+            //Assert
+            using (StoreDbContext dbContext = new StoreDbContext( options ))
+            {
+                P0_RLayer myRepoLayer = new P0_RLayer( dbContext );
+
+                Customer DbCustomer = dbContext.Customers.FirstOrDefault(  x => x.ToString() == $"{strFirstName} {strLastName}");
+
+                Assert.Equal(myGeneratedCustomer.CustomerID, DbCustomer.CustomerID);
+            }
+
+        }
+
+        [Theory]
+        [InlineData(3, 15)]
+        public void UpdateProductStockToInventory(int ProductID, int Quantity)
+        {
+            //Arrange
+            DbContextOptions<StoreDbContext> options =  new DbContextOptionsBuilder<StoreDbContext>()
+            .UseInMemoryDatabase(databaseName: "TestDb")
+            .Options;
+                
+
+            
+            //Act
+            using (StoreDbContext dbContext = new StoreDbContext( options ))
+            {
+                P0_RLayer myRepoLayer = new P0_RLayer( dbContext );
+
                 CustomerLogInRequest = myRepoLayer.CreateCustomer();
+
+                //SetOrderForCustomer
             }
 
             //Assert
@@ -38,7 +73,6 @@ namespace P0_RepositoryLayer.Tests
 
                 Assert.Equal(true, customerIsInDB);
             }
-
         }
 
     }

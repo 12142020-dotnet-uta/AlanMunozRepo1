@@ -37,6 +37,10 @@ namespace P0_CLibrary.Models
             set { dtmDate = value; }
         }
         
+        /// <summary>
+        /// This method is used to get all the TotalAmount from the OrderDetails.
+        /// </summary>
+        /// <returns>Returns a double parameter with the totalAmount.</returns>
         public double GetTotalAmountFromOrderDetail()
         {
             double result = 0;

@@ -6,7 +6,10 @@ namespace P0_RepositoryLayer.Models
         SearchCustomer,
         CustomerHistory,
         StoreHistory,
+        AddStore,
+        ProductInventory,
         LogOut,
+        Exit,
         NotValid
     }
 }

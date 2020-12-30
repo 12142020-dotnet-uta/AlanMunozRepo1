@@ -81,24 +81,20 @@ namespace P0_RepositoryLayer.Models
                     LastName = strLastName,
                     Location = Locations.Find( x => x.LocationID == 1 ),
                 };
-                // using(StoreDbContext Db = new StoreDbContext())
-                // {
-                    // ->
-                    myDbContext.Customers.Add(customer);
-                    myDbContext.Locations.Update(customer.Location);
-                    myDbContext.Inventory.UpdateRange(customer.Location.Inventory);
-                    //Db.Products.UpdateRange(customer.Location.Inventory)
-                    foreach (Inventory inventory in customer.Location.Inventory)
-                    {
-                        myDbContext.Products.Update(inventory.Product);
-                    }
+
+                myDbContext.Customers.Add(customer);
+                myDbContext.Locations.Update(customer.Location);
+                myDbContext.Inventory.UpdateRange(customer.Location.Inventory);
+                    
+                foreach (Inventory inventory in customer.Location.Inventory)
+                {
+                    myDbContext.Products.Update(inventory.Product);
+                }
 
                     // ->
-                    myDbContext.SaveChanges();
+                myDbContext.SaveChanges();
 
-                    this.Customers = myDbContext.Customers.ToList();
-                // }
-                // this.Customers.Add(customer);
+                this.Customers = myDbContext.Customers.ToList();
 
                 return $"The customer {customer.ToString()} was created successfully.\n";
             }
@@ -181,7 +177,7 @@ namespace P0_RepositoryLayer.Models
 
             string strLocations = "\nLocationID\t\tName\n";
 
-            foreach (Location local in this.Locations.Where( x => x.LocationID != this.LoggedCustomer.Location.LocationID ).OrderBy( x => x.LocationID ) ) //Except( this.LoggedCustomer.Location ) )
+            foreach (Location local in myDbContext.Locations.Where( x => x.LocationID != this.LoggedCustomer.Location.LocationID ).OrderBy( x => x.LocationID ) ) //Except( this.LoggedCustomer.Location ) )
             {
                 strLocations += $"{local.LocationID}\t\t{local.Name}\n";
             }
@@ -197,7 +193,7 @@ namespace P0_RepositoryLayer.Models
         {
             string strLocations = "\nLocationID\t\tName\n";
 
-            foreach (Location local in this.Locations.OrderBy( x => x.LocationID ) ) //Except( this.LoggedCustomer.Location ) )
+            foreach (Location local in myDbContext.Locations.OrderBy( x => x.LocationID ) ) //Except( this.LoggedCustomer.Location ) )
             {
                 strLocations += $"{local.LocationID}\t\t{local.Name}\n";
             }
@@ -263,8 +259,9 @@ namespace P0_RepositoryLayer.Models
                 // Verify if the changelocation Works in DB.
                 myDbContext.Customers.Update(this.LoggedCustomer);
                 myDbContext.SaveChanges();
-            // }
 
+            // }
+            this.Customers.First(x => x.CustomerID == this.LoggedCustomer.CustomerID).Location = this.LoggedCustomer.Location;
         }
 
         /// <summary>
@@ -310,6 +307,7 @@ namespace P0_RepositoryLayer.Models
 
         }
 
+
         /// <summary>
         /// This method is used for set the private CurrentOrder object and assign the product details and quantity into the customer order.
         /// </summary>
@@ -317,29 +315,36 @@ namespace P0_RepositoryLayer.Models
         /// <param name="Quantity">int parameter, is the Quantity of products to add in the order</param>
         public void SetOrderForCustomer(int ProductID, int Quantity)
         {
+
             Inventory myInventory = LocalInventory.First( x=> x.Product.ProductID == ProductID );            
-
-            //Inventory myInventory = Inventory.First( x=> x.InventoryID == intInventoryID );
+            
+            if ( Quantity <= myInventory.Quantity)
+            {
+                //Product available
+                OrderDetail myOrderDetail = new OrderDetail();
 
             
-            OrderDetail myOrderDetail = new OrderDetail();
+                myOrderDetail.Product = myInventory.Product;
+                myOrderDetail.Quantity = Quantity;
 
-            
-            myOrderDetail.Product = myInventory.Product;
-            myOrderDetail.Quantity = Quantity;
+                myInventory.Quantity -= Quantity;
 
-            myInventory.Quantity -= Quantity;
+                //Update to DB...
+                // using(StoreDbContext Db = new StoreDbContext())
+                // {
+                    // Verify if the changelocation Works in DB.
+                    myDbContext.Inventory.Update(myInventory);
+                    myDbContext.SaveChanges();
+                // }
 
-            //Update to DB...
-            // using(StoreDbContext Db = new StoreDbContext())
-            // {
-                // Verify if the changelocation Works in DB.
-                myDbContext.Inventory.Update(myInventory);
-                myDbContext.SaveChanges();
-            // }
+                this.CurrentOrder.OrderDetails.Add(myOrderDetail);
 
-            this.CurrentOrder.OrderDetails.Add(myOrderDetail);
-
+            }
+            else
+            {
+                //product not available
+                throw new Exception("The quantity received is greater than the available inventory.");
+            }
         }
 
         /// <summary>
@@ -357,8 +362,9 @@ namespace P0_RepositoryLayer.Models
         /// </summary>
         private void SaveOrderChanges()
         {
-                myDbContext.Orders.Add(this.CurrentOrder);
-                myDbContext.SaveChanges();
+            myDbContext.Orders.Add(this.CurrentOrder);
+            this.Orders.Add(this.CurrentOrder);
+            myDbContext.SaveChanges();
         }
 
         public string PrintOrder()
@@ -367,7 +373,7 @@ namespace P0_RepositoryLayer.Models
             SaveOrderChanges();
             string strOrderResult = $"Order by customer {LoggedCustomer.ToString()}\t\tLocation: {LoggedCustomer.Location.Name}\nDate: {this.CurrentOrder.Date}\n";
 
-            double dblTotalAmount = this.CurrentOrder.GetTotalAmountFromOrderDetail();
+            double dblTotalAmount = Math.Round( this.CurrentOrder.GetTotalAmountFromOrderDetail(), 2);
 
 
             foreach (OrderDetail odetail in this.CurrentOrder.OrderDetails)
@@ -396,9 +402,13 @@ namespace P0_RepositoryLayer.Models
         /// <returns>Returns a string with a table-like format.</returns>
         public string GetAllTheHistoryFromCustomer()
         {
+            //if ()
+            //{
+
+            //}
             string strCustomerHistory = $"For the logged customer {this.LoggedCustomer.ToString()}:\n";
 
-            List<Order> CustomerOrders = myDbContext.Orders.Where( x=> x.Customer.CustomerID == this.LoggedCustomer.CustomerID ).ToList();
+            List<Order> CustomerOrders = this.Orders.Where( x=> x.Customer.CustomerID == this.LoggedCustomer.CustomerID ).ToList();
 
 
             foreach ( Order order in CustomerOrders )
@@ -423,11 +433,11 @@ namespace P0_RepositoryLayer.Models
         /// This method is called for generate a table-like format with the total orders the selected store have generated so long. 
         /// </summary>
         /// <returns>Returns a string with a table-like format.</returns>
-        public string GetAllTheHistoryFromCustomer(int intLocationID)
+        public string GetAllTheHistoryFromStore(int intLocationID)
         {
-            Location myLocation = myDbContext.Locations.First( x => x.LocationID == intLocationID );
+            Location myLocation = this.Locations.First( x => x.LocationID == intLocationID );
 
-            List<Order> StoreOrders = myDbContext.Orders
+            List<Order> StoreOrders = this.Orders
                 .Where(x => x.Location.LocationID == intLocationID).ToList();
 
             string strLocationHistory = $"For the selected store: {myLocation.Name}:\n";
@@ -450,6 +460,139 @@ namespace P0_RepositoryLayer.Models
             }
 
             return strLocationHistory;
+        }
+
+        /// <summary>
+        /// This method is used for get all the products from the passed locationID parameter. It generate a table-like results with the products and save into a localInventory
+        /// for later access, then it returns the table-like string to print into the console.
+        /// </summary>
+        /// <param name="intLocationID">int parameter, is the LocationID</param>
+        /// <returns>returns a table-like string with the products available</returns>
+        public string GetAllProductsFromInventory( int intLocationID)
+        {
+            this.LocalInventory.Clear();
+            Location myLocation = this.Locations.First( x => x.LocationID == intLocationID );
+
+            string strAllProductsFromInv = "\nProduct ID\t\tProduct Name\t\tQuantity\t\tPrice\n";
+            foreach (Inventory inv in myLocation.Inventory)
+            {
+                strAllProductsFromInv += $"{inv.Product.ProductID}\t\t{inv.Product.Name}\t\t{inv.Quantity}\t\t{inv.Product.Price}\n";
+                LocalInventory.Add(inv);
+            }
+
+            return strAllProductsFromInv;
+        }
+
+        /// <summary>
+        /// This method is for updating the quantity of a already created product in the store inventory.
+        /// </summary>
+        /// <param name="intProductID">int parameter, is the Product ID we want to search into the local Inventory</param>
+        /// <param name="intQuantity">int parameter, is the new quantity the product have in stock</param>
+        public void SetProductFromInventory(int intProductID, int intQuantity)
+        {
+
+
+            Inventory myInventory = this.LocalInventory.First( x => x.Product.ProductID == intProductID );
+
+            myInventory.Quantity = intQuantity;
+
+            myDbContext.Inventory.Update(myInventory);
+            myDbContext.SaveChanges();
+
+            this.Inventory = myDbContext.Inventory.ToList();
+
+        }
+        /// <summary>
+        /// This method is used for adding a new product into the store, or if the product was already created, links the new Inventory into the location to be available in the
+        /// store. If the Product is new, it will create a new product, else it will add only a new Inventory with the product within.
+        /// </summary>
+        /// <param name="intLocationID">int parameter, is the LocationID for searching into the Local</param>
+        /// <param name="strName">string parameter, is the Name of the product</param>
+        /// <param name="strDescription">string parameter, is the Description of the product</param>
+        /// <param name="dblPrice">double parameter, is the total price for the product</param>
+        /// <param name="intQuantity">int parameter, is the quantity the product will have in the inventory</param>
+        public void AddProductIntoStoreInventory(int intLocationID , string strName, string strDescription, double dblPrice, int intQuantity)
+        {
+
+            if ( this.myDbContext.Products.ToList().Exists(x => x.Name == strName && x.Description == strDescription) )
+            {
+                //It exist, only add to this store inventory with 
+                Product VerifyExistingProduct = this.myDbContext.Products.FirstOrDefault(x => x.Name == strName && x.Description == strDescription);
+
+                Inventory myInventory = new Inventory();
+
+                myInventory.Quantity = intQuantity;
+                myInventory.Product = VerifyExistingProduct;
+
+                Location StoreInventory = this.Locations.First(x => x.LocationID == intLocationID);
+
+
+                StoreInventory.Inventory.Add(myInventory);
+
+                this.myDbContext.Locations.Update(StoreInventory);
+                this.myDbContext.Inventory.Add( myInventory );
+
+                this.myDbContext.SaveChanges();
+            }
+            else
+            {
+                Product myProduct = new Product();
+
+                myProduct.Name = strName;
+                myProduct.Price = dblPrice;
+                myProduct.Description = strDescription;
+
+                Inventory myInventory = new Inventory();
+
+                myInventory.Quantity = intQuantity;
+                myInventory.Product = myProduct;
+
+                Location StoreInventory = this.Locations.First( x => x.LocationID == intLocationID );
+
+                StoreInventory.Inventory.Add( myInventory );
+            
+                this.myDbContext.Locations.Update( StoreInventory );
+
+                this.myDbContext.SaveChanges();
+
+            }
+
+            
+
+
+        }
+
+        /// <summary>
+        /// This method is for verify if the created store is already created, if is created, it returns a true, else it will create the new location and return false
+        /// </summary>
+        /// <param name="strName">string parameter, is the name of the new store</param>
+        /// <returns>Returns a true when the store already exists, else it will create the store and will return false</returns>
+        public bool IfStoreAlreadyExists(string strName)
+        {
+            if (this.Locations.Exists(x => x.Name == strName))
+                return true;
+            else
+            {
+                CreateNewStoreLocation(strName);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// This method is called when creating a new store, it will save the new store into the Database.
+        /// </summary>
+        /// <param name="strName">string parameter, is the name of the new store</param>
+        public void CreateNewStoreLocation(string strName)
+        {
+            Location myLocation = new Location();
+
+            myLocation.Name = strName;
+            myLocation.Inventory = new List<Inventory>();
+
+            this.Locations.Add(myLocation);// local
+            this.myDbContext.Locations.Add( myLocation ); //DB
+
+            this.myDbContext.SaveChanges();
         }
     }
 }

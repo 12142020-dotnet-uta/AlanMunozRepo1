@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\P0_RepositoryLayer\P0_RepositoryLayer.csproj" />
+    <ProjectReference Include="..\P0_CLibrary\P0_CLibrary.csproj" />
   </ItemGroup>
 
 </Project>

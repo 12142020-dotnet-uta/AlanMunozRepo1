@@ -26,7 +26,10 @@ namespace P0_CLibrary.Models
             get { return objLocation; }
             set { objLocation = value; }
         }
-
+        /// <summary>
+        /// Overrided method ToString, it returns the complete name of the customer
+        /// </summary>
+        /// <returns>Returns the full name of the customer with space between the first and last names.</returns>
         public override string ToString()
         {
             return $"{strFirstName} {this.strLastName}";

@@ -38,16 +38,37 @@ namespace Store_RepositoryLayer
             //Customer gsCust = new Customer { FirstName = "Gabriel", LastName = "Schroeder", Location = centralLocation };
             //Customer jdCust = new Customer { FirstName = "John", LastName = "Doe", Location = centralLocation };
 
+            Department FruitNVegetables = new Department
+            {
+                Name = "Fruit and Vegetables"
+            };
+            Department Beverages = new Department()
+            {
+                Name = "Beverages"
+            };
+            Department Hygiene = new Department()
+            {
+                Name = "Hygiene"
+            };
+            Department Food = new Department()
+            {
+                Name = "Food"
+            };
+            Department Candies = new Department()
+            {
+                Name = "Candies"
+            };
+
             
 
-            Product appleProd = new Product { Name = "Apples", Price = 0.6, Description = "One apple, Its distinctively sweet flavor makes a perfect snack" };
-            Product toiletProd = new Product { Name = "Toilet Paper Generic 6 rolls", Price = 3, Description = "Our Finest Ultra Soft Toilet Paper" };
-            Product bottledProd = new Product { Name = "Bottled Water 16 Fl. oz.", Price = 0.6, Description = "Purified drinking water" };
-            Product cocaProd = new Product { Name = "Coca-Cola 12 Fl. oz.", Price = 1.2, Description = "The delicious soda you know and love." };
-            Product chocolProd = new Product { Name = "Hershey's Milk Chocolate Bar", Price = 0.92, Description = "Great For Making Personalized Party FavorsGluten-Free And Kosher Chocolate Candy" };
-            Product angusProd = new Product { Name = "Black Angus Top Round Steak", Price = 0.8, Description = "Often referred to as London broil, this lean, flavorful steak is guaranteed to make your mouth water." };
-            Product milkProd = new Product { Name = "Whole Milk 1 Gal.", Price = 0.6, Description = "Vitamin D. Grade A, pasteurized, homogenized." };
-            Product eggsProd = new Product { Name = "Large Eggs Dozen", Price = 0.9, Description = "Grade A large brown eggs" };
+            Product appleProd = new Product { Name = "Apples", Price = 0.6, Description = "One apple, Its distinctively sweet flavor makes a perfect snack" , Department =FruitNVegetables};
+            Product toiletProd = new Product { Name = "Toilet Paper Generic 6 rolls", Price = 3, Description = "Our Finest Ultra Soft Toilet Paper" ,Department=Hygiene};
+            Product bottledProd = new Product { Name = "Bottled Water 16 Fl. oz.", Price = 0.6, Description = "Purified drinking water" ,Department=Beverages};
+            Product cocaProd = new Product { Name = "Coca-Cola 12 Fl. oz.", Price = 1.2, Description = "The delicious soda you know and love." ,Department=Beverages};
+            Product chocolProd = new Product { Name = "Hershey's Milk Chocolate Bar", Price = 0.92, Description = "Great For Making Personalized Party FavorsGluten-Free And Kosher Chocolate Candy" ,Department=Candies};
+            Product angusProd = new Product { Name = "Black Angus Top Round Steak", Price = 0.8, Description = "Often referred to as London broil, this lean, flavorful steak is guaranteed to make your mouth water.",Department = Food };
+            Product milkProd = new Product { Name = "Whole Milk 1 Gal.", Price = 0.6, Description = "Vitamin D. Grade A, pasteurized, homogenized.",Department= Beverages };
+            Product eggsProd = new Product { Name = "Large Eggs Dozen", Price = 0.9, Description = "Grade A large brown eggs", Department=Food };
             // var products = new Product[]
             // {
             // new Product{Name="Apples",Price=0.6,Description="One apple, Its distinctively sweet flavor makes a perfect snack"},
@@ -64,6 +85,7 @@ namespace Store_RepositoryLayer
             //     context.Products.Add(p);
             // }
             // context.SaveChanges();
+
             centralLocation.Inventory = new List<Inventory>();
             location1.Inventory = new List<Inventory>();
             location2.Inventory = new List<Inventory>();
@@ -71,7 +93,7 @@ namespace Store_RepositoryLayer
             List<Inventory> centralInventory = new List<Inventory>
             {
                 new Inventory{Product=appleProd,Quantity = 20},
-                new Inventory{Product= toiletProd, Quantity=10},
+                new Inventory{Product= toiletProd, Quantity=10 },
                 new Inventory{Product= bottledProd, Quantity=8},
                 new Inventory{Product= cocaProd, Quantity=15},
                 new Inventory{Product= chocolProd, Quantity=8},

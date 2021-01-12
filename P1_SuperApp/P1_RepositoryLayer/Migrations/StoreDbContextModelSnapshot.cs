@@ -249,7 +249,7 @@ namespace P1_RepositoryLayer.Migrations
 
                     b.HasKey("DepartmentID");
 
-                    b.ToTable("Department");
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("P1_ModelLib.Models.Inventory", b =>
@@ -258,9 +258,6 @@ namespace P1_RepositoryLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
-
-                    b.Property<int?>("DepartmentID")
-                        .HasColumnType("int");
 
                     b.Property<int?>("LocationID")
                         .HasColumnType("int");
@@ -272,8 +269,6 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("InventoryID");
-
-                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("LocationID");
 
@@ -361,6 +356,9 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int?>("DepartmentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(180)
@@ -375,6 +373,8 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("ProductID");
+
+                    b.HasIndex("DepartmentID");
 
                     b.ToTable("Products");
                 });
@@ -441,10 +441,6 @@ namespace P1_RepositoryLayer.Migrations
 
             modelBuilder.Entity("P1_ModelLib.Models.Inventory", b =>
                 {
-                    b.HasOne("P1_ModelLib.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID");
-
                     b.HasOne("P1_ModelLib.Models.Location", null)
                         .WithMany("Inventory")
                         .HasForeignKey("LocationID");
@@ -452,8 +448,6 @@ namespace P1_RepositoryLayer.Migrations
                     b.HasOne("P1_ModelLib.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductID");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Product");
                 });
@@ -484,6 +478,15 @@ namespace P1_RepositoryLayer.Migrations
                         .HasForeignKey("ProductID");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("P1_ModelLib.Models.Product", b =>
+                {
+                    b.HasOne("P1_ModelLib.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID");
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("P1_ModelLib.Models.Location", b =>

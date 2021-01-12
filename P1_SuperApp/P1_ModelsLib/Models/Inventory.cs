@@ -28,14 +28,6 @@ namespace P1_ModelLib.Models
             set { intQuantity = value; }
         }
 
-        private Department department;
-
-        [Required]
-        public Department Department
-        {
-            get { return department; }
-            set { department = value; }
-        }
 
         // Verify Deals...
 

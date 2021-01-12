@@ -10,8 +10,8 @@ using P1_RepositoryLayer;
 namespace P1_RepositoryLayer.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20210109021702_test2InRepoLayerWithLogin2")]
-    partial class test2InRepoLayerWithLogin2
+    [Migration("20210111212734_RedoChangesForDepartmentProduct")]
+    partial class RedoChangesForDepartmentProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -261,9 +261,6 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("DepartmentID")
-                        .HasColumnType("int");
-
                     b.Property<int?>("LocationID")
                         .HasColumnType("int");
 
@@ -274,8 +271,6 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("InventoryID");
-
-                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("LocationID");
 
@@ -363,20 +358,25 @@ namespace P1_RepositoryLayer.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int?>("DepartmentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(90)
-                        .HasColumnType("nvarchar(90)");
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(35)
+                        .HasColumnType("nvarchar(35)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.HasKey("ProductID");
+
+                    b.HasIndex("DepartmentID");
 
                     b.ToTable("Products");
                 });
@@ -443,10 +443,6 @@ namespace P1_RepositoryLayer.Migrations
 
             modelBuilder.Entity("P1_ModelLib.Models.Inventory", b =>
                 {
-                    b.HasOne("P1_ModelLib.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID");
-
                     b.HasOne("P1_ModelLib.Models.Location", null)
                         .WithMany("Inventory")
                         .HasForeignKey("LocationID");
@@ -454,8 +450,6 @@ namespace P1_RepositoryLayer.Migrations
                     b.HasOne("P1_ModelLib.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductID");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Product");
                 });
@@ -486,6 +480,15 @@ namespace P1_RepositoryLayer.Migrations
                         .HasForeignKey("ProductID");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("P1_ModelLib.Models.Product", b =>
+                {
+                    b.HasOne("P1_ModelLib.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID");
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("P1_ModelLib.Models.Location", b =>

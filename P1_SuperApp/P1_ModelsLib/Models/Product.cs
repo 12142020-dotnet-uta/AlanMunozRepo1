@@ -13,7 +13,7 @@ namespace P1_ModelLib.Models
         }
         private string strName;
         [StringLength(35, ErrorMessage = "The product name must be from 5 to 20 characters.", MinimumLength = 5)]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
+        //[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Use letters only please")]
         [Required]
         [Display(Name = "Product Name")]
         public string Name
@@ -39,6 +39,15 @@ namespace P1_ModelLib.Models
             set { strDescription = value; }
         }
 
-        
+        private Department department;
+
+        [Required]
+        public Department Department
+        {
+            get { return department; }
+            set { department = value; }
+        }
+
+
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace P1_RepositoryLayer.Migrations
 {
-    public partial class test2InRepoLayerWithLogin2 : Migration
+    public partial class RedoChangesForDepartmentProduct : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -50,21 +50,6 @@ namespace P1_RepositoryLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    ProductID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Price = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(90)", maxLength: 90, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.ProductID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -83,6 +68,28 @@ namespace P1_RepositoryLayer.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    ProductID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(35)", maxLength: 35, nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: false),
+                    DepartmentID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.ProductID);
+                    table.ForeignKey(
+                        name: "FK_Products_Department_DepartmentID",
+                        column: x => x.DepartmentID,
+                        principalTable: "Department",
+                        principalColumn: "DepartmentID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,18 +135,11 @@ namespace P1_RepositoryLayer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductID = table.Column<int>(type: "int", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    DepartmentID = table.Column<int>(type: "int", nullable: true),
                     LocationID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Inventory", x => x.InventoryID);
-                    table.ForeignKey(
-                        name: "FK_Inventory_Department_DepartmentID",
-                        column: x => x.DepartmentID,
-                        principalTable: "Department",
-                        principalColumn: "DepartmentID",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Inventory_Locations_LocationID",
                         column: x => x.LocationID,
@@ -338,11 +338,6 @@ namespace P1_RepositoryLayer.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Inventory_DepartmentID",
-                table: "Inventory",
-                column: "DepartmentID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Inventory_LocationID",
                 table: "Inventory",
                 column: "LocationID");
@@ -371,6 +366,11 @@ namespace P1_RepositoryLayer.Migrations
                 name: "IX_Orders_LocationID",
                 table: "Orders",
                 column: "LocationID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_DepartmentID",
+                table: "Products",
+                column: "DepartmentID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -400,9 +400,6 @@ namespace P1_RepositoryLayer.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Department");
-
-            migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
@@ -410,6 +407,9 @@ namespace P1_RepositoryLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Department");
 
             migrationBuilder.DropTable(
                 name: "Locations");

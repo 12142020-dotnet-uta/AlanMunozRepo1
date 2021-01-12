@@ -34,16 +34,19 @@ namespace SuperApp
             services.AddScoped<StoreDbContext>();
             services.AddScoped<Repository>();
             services.AddScoped<BuisnessLogicClass>();
+            services.AddScoped<Mapper>();
 
             services.AddDbContext<StoreDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("TestConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<Customer>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<Customer>(options => options.SignIn.RequireConfirmedAccount = false) ///This thing...
                 .AddEntityFrameworkStores<StoreDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddSession();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -99,6 +102,9 @@ namespace SuperApp
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
+
 
             app.UseEndpoints(endpoints =>
             {

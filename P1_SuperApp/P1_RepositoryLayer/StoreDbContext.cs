@@ -15,6 +15,7 @@ namespace P1_RepositoryLayer
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Department> Departments { get; set; }
 
         public StoreDbContext() { }
 

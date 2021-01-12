@@ -19,7 +19,7 @@ namespace P1_ModelLib.Models
 
         private string strName;
         [StringLength(30, ErrorMessage = "The department name must be from 5 to 30 characters.", MinimumLength = 5)]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
+        //[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Use letters only please")]
         [Required]
         public string Name
         {

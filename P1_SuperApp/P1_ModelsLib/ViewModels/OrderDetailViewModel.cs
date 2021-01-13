@@ -7,22 +7,18 @@ using System.Threading.Tasks;
 
 namespace P1_ModelLib.ViewModels
 {
-    public class InventoryViewModel
+    public class OrderDetailViewModel
     {
-        public int InventoryID { get; set; }
+        public int OrderDetailID { get; set; }
 
         [Display(Name = "Product Name")]
         public string ProductName { get; set; }
-
-        [Display(Name = "Product Description")]
-        public string ProductDescription { get; set; }
-
         [Display(Name ="Product Price")]
         public double ProductPrice { get; set; }
+        public int Quantity { get; set; }
 
-        [Required]
-        [Range(0, 99, ErrorMessage = "The minimum quantity is up to 0 and the maximum quantity of the inventory is up to 99.")]
-        public int Quantity { get; set; }   
+        [Display(Name ="Product Total Amount")]
+        public double TotalAmountDetail { get; set; }
 
 
     }

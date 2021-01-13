@@ -43,6 +43,8 @@ namespace SuperApp
 
             services.AddDefaultIdentity<Customer>(options => options.SignIn.RequireConfirmedAccount = false) ///This thing...
                 .AddEntityFrameworkStores<StoreDbContext>();
+                //.AddRoles<IdentityRole>();
+            //
             services.AddControllersWithViews();
             services.AddRazorPages();
 

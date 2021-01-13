@@ -7,9 +7,15 @@
 
 <h1>Stores</h1>
 
-<p>
-    <a asp-action="Create">Create New Store</a>
-</p>
+<div class="row">
+    <div class="col-md-8">
+        <a asp-action="Create">Create New Store</a>
+
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Product" asp-action="Index">List the Products</a>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -18,6 +24,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                Inventory
             </th>
             <th></th>
         </tr>
@@ -32,10 +41,12 @@
                 @Html.DisplayFor(modelItem => item.Address)
             </td>
             <td>
+                <a asp-controller="Inventory" asp-action="Index" asp-route-storeId="@item.LocationID" asp-route-storeName="@item.Name">View Inventory</a>
+            </td>
+            <td>
                 <a asp-action="Edit" asp-route-id="@item.LocationID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.LocationID">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.LocationID">Delete</a> |
-                <a asp-controller="Inventory" asp-action="Index" asp-route-storeId="@item.LocationID" asp-route-storeName="@item.Name">View Inventory</a>
             </td>
         </tr>
 }

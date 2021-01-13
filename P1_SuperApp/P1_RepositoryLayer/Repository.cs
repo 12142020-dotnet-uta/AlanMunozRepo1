@@ -293,5 +293,249 @@ namespace P1_RepositoryLayer
             _storeDbContext.Locations.Update(StoreLocation);
             SaveChangesToDb();
         }
+
+        public List<Customer> GetAllTheCustomers()
+        {
+            List<Customer> customers = _storeDbContext.Users
+                .Include(customer => customer.Location).ToList();
+            return customers;
+        }
+
+        public CustomerViewModel ConvertCustomerIntoVM(Customer customer)
+        {
+            CustomerViewModel customerViewModel = _mapper.ConvertCustomerIntoCustomerVM(customer);
+            return customerViewModel;   
+        }
+
+        public Customer GetCustomerByID(int id)
+        {
+            Customer customer = _storeDbContext.Users
+                .Include(customer => customer.Location)
+                .First(x => x.Id == id);
+            return customer;
+        }
+
+        public void UpdateCustomer(int id,CustomerViewModel customerViewModel, int LocationID)
+        {
+            Customer customer = _storeDbContext.Users.First( x => x.Id == id );
+
+            Location location = GetStoreLocationIncludingInventoryAndProduct(LocationID);
+
+            customer.FirstName = customerViewModel.FirstName;
+            customer.LastName = customerViewModel.LastName;
+            customer.Location = location;
+
+            _storeDbContext.Users.Update(customer);
+            // Review This method....
+            SaveChangesToDb();
+            
+        }
+
+        public void DeleteUser(int id, string UserEmail)
+        {
+            //Verify if is the same user, if so, cancel request in a exception
+            Customer customer = _storeDbContext.Users.First(x => x.Id == id);
+
+            if (customer.Email == UserEmail)
+            {
+                //Means it tries to delete himself.
+                throw new Exception("The user can't delete himself.");
+            }
+            
+                //Delete that user.
+                _storeDbContext.Users.Remove(customer);
+                SaveChangesToDb();
+        }
+
+        public Customer GetLoggedUserByUserName(string UserEmail)
+        {
+            Customer customer = _storeDbContext.Users
+                .Include(user => user.Location)
+                .First(x => x.UserName == UserEmail);
+            return customer;
+        }
+        public int CreateOrUpdatePendingOrder(int UserID, int StoreID)
+        {
+            //Verify if it exists a pending order in the table for the user and the store he actual is.
+            Order order = GetOrderByUserIDOrderIDAndIsActive(UserID, StoreID);
+
+            int OrderID = 0;
+
+            if (order == null)
+            {
+                //It doesnt exists, create a new order.
+                Order NewOrder = new Order()
+                {
+                    Customer = GetCustomerByID(UserID),
+                    IsCartActive = true,
+                    Location = GetLocationByID(StoreID),
+                    TotalAmount = 0,
+                    Date = DateTime.Now
+                };
+
+                _storeDbContext.Orders.Add(NewOrder);
+                SaveChangesToDb();
+
+                OrderID = _storeDbContext.Orders.First(x => x.Customer.Id == UserID && x.Location.LocationID == StoreID && x.IsCartActive == true).OrderID;
+            }
+            else 
+            {
+                //else it exists, we return the OrderID for saving the OrderDetails
+                OrderID = order.OrderID;
+
+            }
+            return OrderID;
+        }
+
+        public Order GetOrderByUserIDOrderIDAndIsActive(int UserID, int StoreID)
+        {
+            Order order = _storeDbContext.Orders
+                .Include(order => order.OrderDetails)
+                .ThenInclude(odetail => odetail.Product)
+                .FirstOrDefault(x => x.Customer.Id == UserID && x.Location.LocationID == StoreID && x.IsCartActive == true);
+            return order;
+        }
+
+
+        public void SetQuantityForOrder(InventoryViewModel inventoryViewModel, int StoreID, int UserID)
+        {
+            //First Validate if the Quantity do not pass the actual quantity
+            Inventory inventory = _storeDbContext.Inventory
+                .Include(inv => inv.Product)
+                .First(x => x.InventoryID == inventoryViewModel.InventoryID);
+
+            if (inventory.Quantity >= inventoryViewModel.Quantity)
+            {
+                //If it greater or equal than: Add to order and decrease the inventory quantity
+
+                Order order = GetOrderByUserIDOrderIDAndIsActive(UserID, StoreID);
+
+                order.Date = DateTime.Now;
+
+                //Verify if exists an orderDetail with the product to add the amount and no generating a second orderDetail
+
+
+                    //( _storeDbContext.OrderDetails
+                    //.Include(odetail => odetail.Product)
+                    //.ToList()
+                    //.Exists( x => x.OrderDetailID.== inventory.Product.ProductID ) )
+
+                if (order.OrderDetails.Exists( x => x.Product.ProductID == inventory.Product.ProductID) )
+                {
+                    //Get the OrderDetail and add the new quantity to it
+                    OrderDetail orderDetail = _storeDbContext.OrderDetails.First(x => x.Product.ProductID == inventory.Product.ProductID);
+                    orderDetail.Quantity += inventoryViewModel.Quantity;
+
+                    order.GetTotalAmountFromOrderDetail();
+
+                    inventory.Quantity -= inventoryViewModel.Quantity;
+                    _storeDbContext.Orders.Update(order);
+                    _storeDbContext.Inventory.Update(inventory);
+
+                    SaveChangesToDb();
+                }
+                else
+                {
+                    //Create a new OrderDetail
+                    OrderDetail orderDetail = new OrderDetail()
+                    {
+                        Product = inventory.Product,
+                        Quantity = inventoryViewModel.Quantity,
+                    };
+
+                    order.OrderDetails.Add(orderDetail);
+
+                    //Decrease the inventory from the store
+                    inventory.Quantity -= inventoryViewModel.Quantity;
+
+                    order.GetTotalAmountFromOrderDetail();
+
+
+                    _storeDbContext.Orders.Update(order);
+                    _storeDbContext.Inventory.Update(inventory);
+
+                    SaveChangesToDb();
+                }
+                
+            }
+            else
+            {
+                throw new Exception("The input quantity is greater than the actual inventory quantity.");
+            }
+
+        }
+
+        public List<Order> GetAllTheOrdersByLoggedCustomer(int UserID)
+        {
+            List<Order> orders = _storeDbContext.Orders
+                .Include(order => order.Customer)
+                .Include(order => order.Location)
+                .Where(x => x.Customer.Id == UserID)
+                .ToList();
+            return orders;
+        }
+
+        public OrderViewModel ConvertOrderIntoVM(Order order)
+        {
+            OrderViewModel orderViewModel = _mapper.ConvertOrderIntoOrderVM(order);
+            return orderViewModel;
+
+        }
+
+        public void CompleteOrder(int OrderID)
+        {
+            Order order = GetOrderByID(OrderID);
+
+            if (order.TotalAmount == 0)
+            {
+                //means no product...
+                //idk
+            }
+            else
+            {
+                //Finish the order
+                order.IsCartActive = false;
+
+                _storeDbContext.Orders.Update(order);
+
+                SaveChangesToDb();
+            }
+
+        }
+
+        public Order GetOrderByID(int OrderID)
+        {
+            Order order = _storeDbContext.Orders
+                .First(x => x.OrderID == OrderID);
+            return order;
+        }
+
+        public List<OrderDetail> GetAllTheOrderDetailByOrderID(int OrderID)
+        {
+            Order order = _storeDbContext.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(odetail => odetail.Product)
+                .First(x => x.OrderID == OrderID);
+
+            return order.OrderDetails;
+        }
+        public OrderDetailViewModel ConvertOrderDetailIntoVM(OrderDetail orderDetail)
+        {
+            OrderDetailViewModel orderDetailViewModel = _mapper.ConvertOrderDetailIntoOrderDetailVM(orderDetail);
+            return orderDetailViewModel;
+        }
+
+        public List<Order> GetAllTheOrdersByCurrentLocation(int StoreID)
+        {
+            List<Order> orders = _storeDbContext.Orders
+                .Include(order => order.Customer)
+                .Include(order => order.Location)
+                .Include(order => order.OrderDetails)
+                .ThenInclude(odetail => odetail.Product)
+                .Where(x => x.Location.LocationID == StoreID)
+                .ToList();
+            return orders;
+        }
+
     }
 }

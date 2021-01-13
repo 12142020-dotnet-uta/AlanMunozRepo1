@@ -40,12 +40,29 @@ namespace P1_ModelLib.Models
             get { return dtmDate; }
             set { dtmDate = value; }
         }
-        
+
+        private double _dblTotalAmount;
+
+        public double TotalAmount
+        {
+            get { return _dblTotalAmount; }
+            set { _dblTotalAmount = value; }
+        }
+
+        private bool bolIsCartActive;
+        public bool IsCartActive
+        {
+            get { return bolIsCartActive; }
+            set { bolIsCartActive = value; }
+        }
+
+
+
         /// <summary>
         /// This method is used to get all the TotalAmount from the OrderDetails.
         /// </summary>
         /// <returns>Returns a double parameter with the totalAmount.</returns>
-        public double GetTotalAmountFromOrderDetail()
+        public void GetTotalAmountFromOrderDetail()
         {
             double result = 0;
 
@@ -54,7 +71,7 @@ namespace P1_ModelLib.Models
                 result += (orderDetail.Quantity * orderDetail.Product.Price);
             }
 
-            return result;
+            _dblTotalAmount = result;
         }
 
         IEnumerable<object> ISortBy.SortBy(EnumSortOptions sortOptions)

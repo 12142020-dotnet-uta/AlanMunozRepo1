@@ -16,6 +16,7 @@ namespace P1_ModelLib.ViewModels
         public string Name { get; set; }
 
 
+
         [Required]
         [Range(0.0, double.MaxValue, ErrorMessage = "The price must have a positive value.")]
         public double Price { get; set; }

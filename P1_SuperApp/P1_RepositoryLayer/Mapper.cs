@@ -52,10 +52,52 @@ namespace P1_RepositoryLayer
                 InventoryID = inventory.InventoryID,
                 ProductName = inventory.Product.Name,
                 ProductPrice = inventory.Product.Price,
+                ProductDescription = inventory.Product.Description,
                 Quantity = inventory.Quantity,
             };
 
             return inventoryViewModel;
+        }
+
+        public CustomerViewModel ConvertCustomerIntoCustomerVM(Customer customer)
+        {
+            CustomerViewModel customerViewModel = new CustomerViewModel()
+            {
+                Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email,
+                LocationName = customer.Location.Name,
+            };
+
+            return customerViewModel;
+        }
+        public OrderViewModel ConvertOrderIntoOrderVM(Order order)
+        {
+            OrderViewModel orderViewModel = new OrderViewModel()
+            {
+                CustomerID = order.Customer.Id,
+                CustomerName = order.Customer.ToString(),
+                LocationID = order.Location.LocationID,
+                StoreName = order.Location.Name,
+                Date = order.Date,
+                TotalAmount = order.TotalAmount,
+                isCartActive = order.IsCartActive,
+                OrderID = order.OrderID
+            };
+            return orderViewModel;
+        }
+
+        public OrderDetailViewModel ConvertOrderDetailIntoOrderDetailVM(OrderDetail orderDetail)
+        {
+            OrderDetailViewModel orderDetailViewModel = new OrderDetailViewModel()
+            {
+                ProductName = orderDetail.Product.Name,
+                ProductPrice = orderDetail.Product.Price,
+                Quantity = orderDetail.Quantity,
+                TotalAmountDetail = Math.Round( orderDetail.Product.Price * orderDetail.Quantity, 2 ),
+            };
+            return orderDetailViewModel;
         }
 
     }

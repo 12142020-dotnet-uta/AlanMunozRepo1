@@ -312,8 +312,14 @@ namespace P1_RepositoryLayer.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsCartActive")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("LocationID")
                         .HasColumnType("int");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("float");
 
                     b.HasKey("OrderID");
 

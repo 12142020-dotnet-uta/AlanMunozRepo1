@@ -190,6 +190,114 @@ namespace P1_BuisnessLogicLayer
 
             _repository.DeleteLocation(location);
         }
+
+        ///-----------------------------------------------------------
+        ///
+
+        public List<Customer> GetAllTheCustomers()
+        {
+            List<Customer> customers = _repository.GetAllTheCustomers();
+            return customers;
+        }
+
+        public CustomerViewModel ConvertCustomerIntoVM(Customer customer)
+        {
+            CustomerViewModel customerViewModel = _repository.ConvertCustomerIntoVM(customer);
+            return customerViewModel;
+        }
+        public Customer GetCustomerByID(int id)
+        {
+            Customer customer = _repository.GetCustomerByID(id);
+            return customer;
+        }
+        public CustomerViewModel GetCustomerVMByID(int id)
+        {
+            Customer customer = GetCustomerByID(id);
+
+            CustomerViewModel customerViewModel = _repository.ConvertCustomerIntoVM(customer);
+            return customerViewModel;
+        }
+        public Customer GetLoggedUserByUserName(string UserEmail)
+        {
+            Customer customer = _repository.GetLoggedUserByUserName(UserEmail);
+            return customer;
+        }
+
+
+        public void UpdateCustomer(int id, CustomerViewModel customerViewModel,int LocationID)
+        {
+            _repository.UpdateCustomer(id, customerViewModel, LocationID);
+        }
+
+        public void DeleteUser(int id,  string UserEmail)
+        {
+            try
+            {
+                _repository.DeleteUser(id, UserEmail);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CreateOrUpdatePendingOrder(int UserID, int StoreID)
+        {
+            int OrderID = _repository.CreateOrUpdatePendingOrder(UserID, StoreID);
+            return OrderID;
+        }
+
+        public void SetQuantityForOrder(InventoryViewModel inventoryViewModel,int StoreID,int UserID)
+        {
+            _repository.SetQuantityForOrder(inventoryViewModel, StoreID, UserID);
+        }
+
+        public List<OrderViewModel> GetAllTheOrdersByLoggedCustomer(int UserID)
+        {
+            List<Order> orders = _repository.GetAllTheOrdersByLoggedCustomer(UserID);
+
+            List<OrderViewModel> orderViewModels = new List<OrderViewModel>();
+
+            foreach (Order o in orders)
+            {
+                orderViewModels.Add( _repository.ConvertOrderIntoVM(o) );
+            }
+            return orderViewModels;
+        }
+
+        public void CompleteOrder(int OrderID)
+        {
+            _repository.CompleteOrder(OrderID);
+        }
+
+        public List<OrderDetailViewModel> GetAllTheOrderDetailByOrderID(int OrderID)
+        {
+            List<OrderDetail> orderDetails = _repository.GetAllTheOrderDetailByOrderID(OrderID);
+
+            List<OrderDetailViewModel> orderDetailViewModels = new List<OrderDetailViewModel>();
+
+            foreach (OrderDetail oDetail in orderDetails)
+            {
+                orderDetailViewModels.Add(_repository.ConvertOrderDetailIntoVM(oDetail));
+            }
+
+            return orderDetailViewModels;
+
+        }
+
+        public List<OrderViewModel> GetAllTheOrdersByCurrentLocation(int StoreID)
+        {
+            List<Order> orders = _repository.GetAllTheOrdersByCurrentLocation(StoreID);
+
+            List<OrderViewModel> orderViewModels = new List<OrderViewModel>();
+
+            foreach (Order o in orders)
+            {
+                orderViewModels.Add(_repository.ConvertOrderIntoVM(o));
+            }
+            return orderViewModels;
+        }
+
     }
 }
 

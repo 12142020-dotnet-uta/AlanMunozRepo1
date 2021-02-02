@@ -1,0 +1,24 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Proxy in Angular</h2>  
+
+      <br>
+      
+      <!-- Calling generic API using proxy.conf.json -->
+      <!-- <button class="btn btn-success" (click)='displayRequest()'>Get Resource from The local API</button> -->
+
+      <!-- Calling one API with diferent EndPoints using proxy.conf.js -->
+      <!-- <button class="btn btn-success" (click)='displayExchangeDiferentEndPointRequest()'>Get Resource from The local API</button>
+      <button class="btn btn-success" (click)='displayClockDiferentEndPointRequest()'>Get Remote Server EndpointB</button> -->
+
+      <!-- Calling diferent API's with the proxy-multiple.conf.json -->
+      <button class="btn btn-success" (click)='displayRequest()'>Get Local Weather forecast</button>
+      <button class="btn btn-success" (click)='displayExchangeRequest()'>Get Remote Server EndpointA</button>
+      <button class="btn btn-success" (click)='displayClockRequest()'>Get Remote Server EndpointB</button>
+      <br>
+      <br>
+      {{DisplayJson | json}} 
+    </div>
+  </div>
+</div>

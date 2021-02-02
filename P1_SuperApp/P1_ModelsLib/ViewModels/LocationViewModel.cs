@@ -15,7 +15,8 @@ namespace P1_ModelLib.ViewModels
         [StringLength(30, ErrorMessage = "The name must be from 5 to 30 characters.", MinimumLength = 5)]
         [Required]
         public string Name { get; set; }
-        
+
+
         //View the Warehouse
 
         [Required]

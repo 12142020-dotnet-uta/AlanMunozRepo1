@@ -106,7 +106,7 @@ namespace SuperApp.Controllers
                     _logger.LogError(ex.Message);
                     ModelState.AddModelError("Failure", ex.Message);
 
-                    List<InventoryViewModel> inventoryViewModels = _buisnessLogicClass.GetAllTheInventoryFromStore(StoreID);
+                    List<InventoryViewModel> inventoryViewModels = _buisnessLogicClass.GetAllTheInventoryFromStore(StoreID);    
 
                     return View("Index", inventoryViewModels);
                 }
@@ -134,7 +134,7 @@ namespace SuperApp.Controllers
 
             return View(inventoryViewModel);
         }
-
+            
         // POST: InventoryController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]

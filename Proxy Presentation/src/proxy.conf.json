@@ -1,0 +1,7 @@
+{
+    "*/WeatherForecast": {
+        "target": "https://localhost:44328/",
+        "secure": false,
+        "logLevel": "debug"
+    }
+}
